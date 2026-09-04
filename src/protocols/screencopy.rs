@@ -550,13 +550,19 @@ where
                 );
                 return;
             }
-        } else if shm::with_buffer_contents(&buffer, |_, shm_len, buffer_data| {
-            buffer_data.format == Format::Xrgb8888
-                && buffer_data.width == size.w
-                && buffer_data.height == size.h
-                && buffer_data.stride == size.w * 4
-                && shm_len == buffer_data.stride as usize * buffer_data.height as usize
-        })
+        } else if shm::with_buffer_contents(
+            &buffer,
+            |_, // offset is ignored??????? bitch what the fuck.
+             shm_len,
+             buffer_data| {
+                buffer_data.format == Format::Xrgb8888
+                    && buffer_data.width == size.w
+                    && buffer_data.height == size.h
+                    && buffer_data.stride == size.w * 4
+                    // this fuck is this check???? this prevents me from using larger buffer + offset I think?
+                    && shm_len == buffer_data.stride as usize * buffer_data.height as usize
+            },
+        )
         .unwrap_or(false)
         {
             ScreencopyBuffer::Shm(buffer)
