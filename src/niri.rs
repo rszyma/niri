@@ -188,10 +188,10 @@ use crate::window::{InitialConfigureState, Mapped, ResolvedWindowRules, Unmapped
 
 const CLEAR_COLOR_LOCKED: [f32; 4] = [0.3, 0.1, 0.1, 1.];
 
-// We'll try to send frame callbacks at least once a second. We'll make a timer that fires once a
-// second, so with the worst timing the maximum interval between two frame callbacks for a surface
-// should be ~1.995 seconds.
-const FRAME_CALLBACK_THROTTLE: Option<Duration> = Some(Duration::from_millis(995));
+// We'll try to send frame callbacks at 5 Hz. We'll make a timer that fires five times a
+// second, so with the worst timing the maximum interval between two frame callbacks for a
+// surface should be ~0.4 seconds.
+const FRAME_CALLBACK_THROTTLE: Option<Duration> = Some(Duration::from_millis(200));
 
 pub struct Niri {
     pub config: Rc<RefCell<Config>>,
@@ -2455,10 +2455,10 @@ impl Niri {
 
         event_loop
             .insert_source(
-                Timer::from_duration(Duration::from_secs(1)),
+                Timer::from_duration(Duration::from_millis(200)),
                 |_, _, state| {
                     state.niri.send_frame_callbacks_on_fallback_timer();
-                    TimeoutAction::ToDuration(Duration::from_secs(1))
+                    TimeoutAction::ToDuration(Duration::from_millis(200))
                 },
             )
             .unwrap();
